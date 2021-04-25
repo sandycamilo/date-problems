@@ -52,16 +52,15 @@ const months = ['Jan','Feb','Mar','Apr','May','Jun', 'Jul','Aug','Sep','Oct','No
 // Shows the month for new years
 console.log(months[newYear.getMonth()])
 // Challenge: Show the month of your birthday
-
+console.log(months[matildeBirthday.getMonth()], '<- birthday month')
 // Days of the week are also 0 indexed 0:Sun - 6:Sat 
 const days = ['Sun', 'Mon', 'Tues', 'Wed', 'Thur', 'Fri', 'Sat']
 // Challenge: Show the day of the week of your birthday
-
+console.log(days[matildeBirthday.getDay()], '<- birthday day')
 
 console.log('-------- Data Offsets --------')
 
 // Date offsets show the difference between two dates
-
 const date = new Date()          // Start with a date 
 const startDate = new Date(date) // copy the date
 const dueDate = new Date(date)   // copy the date
@@ -79,7 +78,6 @@ console.log(startDate, dueDate)
 // Check these dates they should be 7 days ago and 3 days from now
 
 
-
 // Try these problems 
 
 console.log('--------- Problem 1 --------')
@@ -90,12 +88,19 @@ console.log('--------- Problem 1 --------')
 // offset is a number, the number days between dates returned
 
 function consecutiveDates(date, repeat, offset) {
-  // Your code here 
+  const arr = []
+  for (let i= 0; i <= repeat; i += 1) {
+    const newDate = new Date(date)
+    newDate.setDate(date.getDate() + offset * i)
+    arr.push(newDate) 
+  }
+  return arr
 }
 
 // Starting date 1/1/2019, repeat 4 times, return dates 
 // 3 days apart
-consecutiveDates(new Date(2019, 0, 1), 4, 3)
+const problem1 = consecutiveDates(new Date(2019, 0, 1), 4, 3)
+console.log(problem1)
 
 // Should return an array with dates:
 // 1. 1/1/2019 <- Starting date
@@ -112,10 +117,28 @@ consecutiveDates(new Date(2019, 0, 1), 4, 3)
 // 2. 1/1/2020
 // 3. 1/1/2021
 
-// function consecutiveDates(date, repeat, offset, unit = 'day') {
-// 
-// }
+function consecutiveDatesTwo(date, repeat = 1, offset = 1, unit = 'day') {
+  const arr = []
+  for (let i = 0; i <= repeat; i += 1) {
+    const newDate = new Date(date)
+    switch(unit){
+      case 'day':
+        newDate.setDate(date.getDate() + offset * i)
+        break
+      case 'month':
+        newDate.setMonth(date.getMonth() + offset * i)
+        break
+      case 'year':
+        newDate.setFullYear(date.getFullYear() + offset * i)
+        break
+    }
+    arr.push(newDate)
+  }
+  return arr
+}
 
+const problem_two = consecutiveDatesTwo(new Date(2019, 0, 1), 3, 1, 'year')
+console.log(problem_two)
 
 
 console.log('--------- Problem 2 --------')
@@ -125,11 +148,19 @@ console.log('--------- Problem 2 --------')
 
 function orderDates(dates) {
   // orders the dates 
+  const newArr = [...dates]
+  // does a or b come first? 
+  // if num is less than 0 - a comes first,
+  //  else if num is greater than 0 - b comes first
+  newArr.sort( (a, b) => {
+    return a - b
+  })
   // returns a new array of ordered dates
+  return newArr
 }
 
-orderDates([today, dueDate, startDate, bday, newYear])
-
+const problem_three = orderDates([today, dueDate, startDate, bday, newYear])
+console.log(problem_three)
 // [bday, startdate, duedate, newyear]
 
 // Stretch: Return an object containing three keys each holding an array of dates. The keys are: 
@@ -140,6 +171,34 @@ orderDates([today, dueDate, startDate, bday, newYear])
 
 // { past: [...], present:[...], future:[...] }
 
+function orderPastPresentFuture(dates) { 
+  // order dates 
+  const newArr = [...dates]
+  newArr.sort( (a, b) => {
+    return a - b
+  })
+  // object with three properties - past, present and future 
+  const results = {past: [], present: [], future: []}
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = today.getMonth()
+  const d = today.getDate()
+
+  newArr.forEach((date) => {
+    if (year === date.getFullYear() && month === date.getMonth() && d === date.getDate()) {
+      results.present.push(date)
+      } else if (date < today) {
+        results.past.push(date)
+      } else {
+        results.future.push(date)
+      }
+  })
+  return results
+}
+
+const problem_four = orderPastPresentFuture([today, dueDate, startDate, bday, newYear])
+console.log(problem_four)
+
 console.log('--------- Problem 3 --------')
 
 // Given an array of dates find the date that will happen next. 
@@ -149,12 +208,52 @@ console.log('--------- Problem 3 --------')
 function nextDate(dates) {
   // find the date that will happen next in dates
   // return the next date
+  const now = new Date()
+  for (let i = 0; i < dates.length; i += 1) {
+    const date = dates[i]
+    if (date > now) {
+      return date
+    }
+  }
+  return false
 }
 
-nextDate([today, dueDate, startDate, bday, newYear])
+const problem_five = nextDate([today, dueDate, startDate, bday, newYear])
+console.log(problem_five)
 
 // Stretch Goal: Return a human readable string: 
 // Your next appointment is 3 days from now. 
+
+function nextDateTwo(dates) {
+  const now = new Date()
+  // order the dates passed in 
+  const newDates = dates.sort((a, b) => {
+    return a - b
+  })
+  // loop over all the items in newDates array 
+  for (let i = 0; i < newDates.length; i += 1) {
+    // get date out of array 
+    const date = dates[i]
+    // ask if date is more than now 
+    if (date > now) {
+      const y = date.getFullYear() - now.getFullYear()
+      const m = date.getMonth() - now.getMonth()
+      const d = date.getDate() - now.getDate()
+      // how long away 
+      if (y > 0) {
+        return `Your appointment is in ${y} years`
+      } else if (m > 0) {
+        return `Your appointment is in ${m} month(s)`
+      } else {
+        return `Your appointment is in ${d} day(s)`
+      }
+    }
+  }
+  return false
+}
+
+const problem_six = nextDateTwo([today, dueDate, startDate, bday, newYear])
+console.log(problem_six)
 
 console.log('--------- Problem 4 --------')
 
@@ -163,15 +262,38 @@ console.log('--------- Problem 4 --------')
 
 function whensYourParty(date, year) {
   // Find the day of the year for your birthday
+  // copy the date 
+  const newDate = new Date(date)
+  // set the year on the date 
+  newDate.setFullYear(year)
+  // get the day of the week 
+  const day = newDate.getDay()
+  // find the day from the array of days and return it
+  const days = ['Sun', 'Mon', 'Tues', 'Thur', 'Fri', 'Sat']
+  return days[day]
 }
 
-whensYourParty(bday, 2022)
+const problem_seven = whensYourParty(bday, 2024)
+console.log(problem_seven)
 
 // Stretch Goal: Return an array listing all 
 // the days when your birthday occured since 
 // you were born. 
 
+function getBirthdayDays(bday) {
+  const arr = []
+  const days = ['Sun', 'Mon', 'Tues', 'Thur', 'Fri', 'Sat']
+  const thisYear = new Date().getFullYear()
+  const birthYear = bday.getFullYear()
+  const date = new Date(bday) 
+  for ( let i = birthYear; i <= thisYear; i += 1) {
+    date.setFullYear(i)
+    arr.push(days[date.getDay()])
+  }
+  return arr
+}
 
+console.log(getBirthdayDays(bday))
 
 const nums = [5555, 888, 77, 2222, 1111, 3333]
 nums.sort((a,b) => a - b)
